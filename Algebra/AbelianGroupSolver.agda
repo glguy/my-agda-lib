@@ -14,6 +14,7 @@ open import Algebra.Group.Exponentiation group
 open import Function using (_⟨_⟩_)
 open import Algebra.CommutativeMonoidSolver commutativeMonoid using (solve; _⊜_) renaming (_⊕_ to _⊙_)
 open import Algebra.Props.Group group
+open import Algebra.Group.MoreProps group using (inverse-unit)
 import Algebra.Props.AbelianGroup as AG
 open AG C using (⁻¹-∙-comm)
 
@@ -104,12 +105,6 @@ private
   negation-involutive (+ zero)  = ≡.refl
   negation-involutive (+ suc n) = ≡.refl
 
-  inverse-unit : ε ≈ ε ⁻¹
-  inverse-unit = begin
-     ε ≈⟨ sym (proj₂ inverse ε) ⟩
-     (ε ∙ ε ⁻¹) ≈⟨ proj₁ identity _ ⟩
-     ε ⁻¹ ∎
-
   negate-zeros : (n : ℕ) → inv-NF (ε-NF {n = n}) ≡ ε-NF
   negate-zeros zero = ≡.refl
   negate-zeros (suc n) = ≡.cong₂ _∷_ ≡.refl (negate-zeros n)
@@ -130,7 +125,7 @@ private
     ⟦ inv x     ⊕  inv x₁ ⇓⟧ ρ ≈⟨ correct-⊕ (inv x) (inv x₁) ρ ⟩
     ⟦ inv x ⟧ ρ ∙ ⟦ inv x₁ ⟧ ρ ≈⟨ ⁻¹-∙-comm (⟦ x ⟧ ρ) (⟦ x₁ ⟧ ρ) ⟩
     ⟦ inv    (x ⊕ x₁)      ⟧ ρ ∎
-  correct-inv :0 [] = inverse-unit
+  correct-inv :0 [] = sym inverse-unit
   correct-inv :0 (x ∷ ρ) = trans (proj₁ identity _) (correct-inv :0 ρ)
   correct-inv {suc n} (var zero) (x ∷ ρ) = begin
     ⟦ inv (var zero)     ⇓⟧ (x ∷ ρ)             ≡⟨ ≡.refl ⟨ ≡.cong₂ _∙_ ⟩ (negate-zeros n ⟨ ≡.cong₂ ⟦_⟧-Normal ⟩ ≡.refl) ⟩

@@ -37,8 +37,8 @@ module Algebra.GroupSolver {a ℓ : Level} (G : Group a ℓ) where
 open Group G using (monoid; Carrier; _∙_; _≈_; ε; ∙-cong; assoc; identity; refl; setoid; sym; _⁻¹; inverse; ⁻¹-cong)
 open import Relation.Binary.EqReasoning setoid using (begin_; _≈⟨_⟩_; _≡⟨_⟩_; _∎)
 open import Algebra.Props.Group G
+open import Algebra.Group.MoreProps G
 
-open import Algebra.MonoidSolver monoid using (solve; _⊙_; _⊜_)
 -- The Syntax type allows us to reflect the shape of the proof
 -- we wish to automate. We will "reflect" our goal into a Syntax
 -- value and use this convert our proof obligation to a much
@@ -133,26 +133,6 @@ private
     (if polarity x then lookup (index x) ρ else lookup (index x) ρ ⁻¹) ∙ resolve (simplify xs) ρ ≈⟨ refl ⟨ ∙-cong ⟩ simplify-preserves xs ρ ⟩
     resolve (x ∷ xs) ρ ∎
 
-  inverse-unit : ε ≈ ε ⁻¹
-  inverse-unit = begin
-     ε ≈⟨ sym (proj₂ inverse ε) ⟩
-     (ε ∙ ε ⁻¹) ≈⟨ proj₁ identity _ ⟩
-     ε ⁻¹ ∎
-
-  ⁻¹-∙-comm : (x y : Carrier) → (x ∙ y) ⁻¹ ≈ y ⁻¹ ∙ x ⁻¹
-  ⁻¹-∙-comm x y = begin
-                           (x ∙ y) ⁻¹ ≈⟨ sym (proj₁ identity _) ⟩
-     ε                    ∙ (x ∙ y) ⁻¹ ≈⟨ sym (proj₁ inverse _) ⟨ ∙-cong ⟩ refl ⟩
-     (y ⁻¹            ∙ y) ∙ (x ∙ y) ⁻¹ ≈⟨ sym (proj₂ identity _) ⟨ ∙-cong ⟩ refl ⟨ ∙-cong ⟩ refl ⟩
-     (y ⁻¹ ∙ ε         ∙ y) ∙ (x ∙ y) ⁻¹ ≈⟨ refl ⟨ ∙-cong ⟩ sym (proj₁ inverse _) ⟨ ∙-cong ⟩ refl ⟨ ∙-cong ⟩ refl ⟩
-     (y ⁻¹ ∙ (x ⁻¹ ∙ x) ∙ y) ∙ (x ∙ y) ⁻¹ ≈⟨ solve 5
-                                               (λ x₁ y₁ x′ y′ z →
-                                                  y′ ⊙ (x′ ⊙ x₁) ⊙ y₁ ⊙ z ⊜ y′ ⊙ (x′ ⊙ (x₁ ⊙ y₁ ⊙ z)))
-                                               refl _ _ _ _ _ ⟩
-     y ⁻¹ ∙ (x ⁻¹ ∙ (x ∙ y ∙ (x ∙ y) ⁻¹)) ≈⟨ refl ⟨ ∙-cong ⟩ (refl ⟨ ∙-cong ⟩ proj₂ inverse _) ⟩ 
-     y ⁻¹ ∙ (x ⁻¹ ∙ ε) ≈⟨ refl ⟨ ∙-cong ⟩ proj₂ identity _ ⟩
-      y ⁻¹ ∙ x ⁻¹ ∎
-
 -- This normalized semantic evaluation function constructs a
 -- value of Carrier which is semantically equivalent to the
 -- one produced by ⟦_⟧, however all occurences of _∙_ are
@@ -172,13 +152,13 @@ private
   rev-inv (term false index) ρ = begin
      lookup index ρ ∙ ε ≈⟨ proj₂ identity _ ⟩
      lookup index ρ ≈⟨ sym (proj₁ identity _) ⟩
-     ε ∙ lookup index ρ ≈⟨ inverse-unit ⟨ ∙-cong ⟩ sym (⁻¹-involutive _) ⟩
+     ε ∙ lookup index ρ ≈⟨ sym inverse-unit ⟨ ∙-cong ⟩ sym (⁻¹-involutive _) ⟩
      ε ⁻¹ ∙ lookup index ρ ⁻¹ ⁻¹ ≈⟨ sym (⁻¹-∙-comm (lookup index ρ ⁻¹) ε) ⟩
      (lookup index ρ ⁻¹ ∙ ε) ⁻¹ ∎
 
   reverse-flatten1 : {n : ℕ} (xs : List (Term n)) (ρ : Vec Carrier n) →
         resolve (map not-term (reverse xs)) ρ ≈ resolve xs ρ ⁻¹
-  reverse-flatten1 [] ρ = inverse-unit
+  reverse-flatten1 [] ρ = sym inverse-unit
   reverse-flatten1 (x ∷ xs) ρ = begin
     resolve (map not-term (reverse (x ∷ xs))) ρ ≡⟨ ≡.cong₂ resolve (≡.cong (map not-term) (reverse-++-commute [ x ] xs)) ≡.refl ⟩
     resolve (map not-term (reverse xs ++ [ x ])) ρ ≡⟨ ≡.cong₂ resolve (map-++-commute not-term (reverse xs) [ x ]) ≡.refl ⟩

@@ -45,13 +45,17 @@ private
 ⟦ x ⇓⟧ ρ = sum (normalize x ρ)
 
 private
+  open import Data.List using (List; []; _∷_)
   sum-++ : (xs ys : List⁺ Carrier) → sum (xs ⁺++⁺ ys) ≈ sum xs ∙ sum ys
-  sum-++ [ x ] [ y ] = refl
-  sum-++ [ x ] (y ∷ ys) = refl
-  sum-++ (x ∷ xs) ys = begin
-    x ∙  sum (xs ⁺++⁺ ys)   ≈⟨ ∙-cong refl (sum-++ xs ys) ⟩
-    x ∙ (sum xs ∙ sum ys) ≈⟨ sym (assoc _ _ _) ⟩
-    x ∙  sum xs ∙ sum ys  ∎
+  sum-++ (x ∷ xs) ys = lemma x xs
+    where
+    lemma : (x : Carrier) (xs : List Carrier) →
+      sum ((x ∷ xs) ⁺++⁺ ys) ≈ sum (x ∷ xs) ∙ sum ys
+    lemma _ [] = refl
+    lemma x₁ (x₂ ∷ xs) = begin
+      sum ((x₁ ∷ x₂ ∷ xs) ⁺++⁺ ys)  ≈⟨ ∙-cong refl (lemma x₂ xs) ⟩
+      x₁ ∙ (sum (x₂ ∷ xs) ∙ sum ys) ≈⟨ sym (assoc _ _ _) ⟩
+      sum (x₁ ∷ x₂ ∷ xs) ∙ sum ys  ∎
 
 -- By proving that these two semantic evaluation functions produce
 -- semantically equivalent values we'll be able to use equivalence

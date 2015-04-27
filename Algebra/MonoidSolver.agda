@@ -99,16 +99,18 @@ open R setoid var ⟦_⟧ ⟦_⇓⟧ correct public using (prove; close; solve; 
 
 private
   -- Now for a simple example
-  Example = ∀ a b c d → (a ∙ b) ∙ (c ∙ d) ≈ a ∙ (b ∙ c) ∙ d
+  Example = ∀ a b c d → (a ∙ ε ∙ b) ∙ (ε ∙ c ∙ d) ≈ a ∙ (b ∙ c) ∙ d
 
   -- A manual proof using equational reasoning looks like this.
   manual : Example
   manual a b c d = begin
-    (a ∙ b) ∙ (c ∙ d) ≈⟨ sym (assoc (a ∙ b) c d) ⟩
-     a ∙ b  ∙  c ∙ d  ≈⟨ ∙-cong (assoc a b c) refl ⟩
-     a ∙ (b ∙ c) ∙ d  ∎
+    (a ∙  ε ∙ b)  ∙ (ε ∙  c  ∙ d)  ≈⟨ ∙-cong (assoc a ε b) (assoc ε c d) ⟩
+    (a ∙ (ε ∙ b)) ∙ (ε ∙ (c  ∙ d)) ≈⟨ ∙-cong (∙-cong refl (proj₁ identity b)) (proj₁ identity (c ∙ d)) ⟩
+    (a ∙      b)  ∙      (c  ∙ d)  ≈⟨ sym (assoc (a ∙ b) c d) ⟩
+     a ∙      b   ∙       c  ∙ d   ≈⟨ ∙-cong (assoc a b c) refl ⟩
+     a ∙     (b   ∙       c) ∙ d   ∎
 
   -- Let's see the solver in action!
   automatic : Example
-  automatic = solve 4 (λ a b c d → (a ⊙ b) ⊙ (c ⊙ d) ⊜ a ⊙ (b ⊙ c) ⊙ d) refl
+  automatic = solve 4 (λ a b c d → (a ⊙ :0 ⊙ b) ⊙ (:0 ⊙ c ⊙ d) ⊜ a ⊙ (b ⊙ c) ⊙ d) refl
                                 -- ^ Here we reflect the shape of the proof we want

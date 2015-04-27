@@ -17,6 +17,8 @@ module Algebra.Group.Exponentiation {c ℓ} (G : Group c ℓ) where
   x ^-ℕ zero = ε
   x ^-ℕ ℕ.suc n = x ∙ x ^-ℕ n
 
+  infixl 8 _^-ℕ_
+
   _^_ : Carrier → ℤ → Carrier
   x ^ -[1+ n ] = (x ⁻¹) ^-ℕ (ℕ.suc n)
   x ^ (+ n) = x ^-ℕ n
@@ -29,7 +31,7 @@ module Algebra.Group.Exponentiation {c ℓ} (G : Group c ℓ) where
   simplify-right′ x (ℕ.suc n) = begin
     x ∙ (x ∙ x ^-ℕ n) ≈⟨ refl ⟨ ∙-cong ⟩ simplify-right′ x n ⟩
     x ∙ (x ^-ℕ n ∙ x) ≈⟨ sym (assoc _ _ _) ⟩
-    x ∙ x ^-ℕ n ∙ x ∎ 
+    x ∙ x ^-ℕ n ∙ x ∎
 
   exp-plus′ : ∀ x i j → (x ^-ℕ i) ∙ (x ^-ℕ j) ≈ (x ^-ℕ (Data.Nat._+_ i j))
   exp-plus′ x zero j = proj₁ identity _

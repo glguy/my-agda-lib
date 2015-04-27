@@ -22,7 +22,7 @@
 open import Algebra using (Group; module Group)
 open import Data.Nat using (ℕ)
 open import Data.Fin using (Fin)
-open import Data.Fin.Props using (_≟_)
+open import Data.Fin.Properties using (_≟_)
 open import Relation.Nullary using (Dec; yes; no)
 open import Data.Vec using (Vec; lookup)
 open import Data.List using (List; _∷_; []; [_]; _++_; foldr; _∷ʳ_; map; reverse)
@@ -36,7 +36,7 @@ module Algebra.GroupSolver {a ℓ : Level} (G : Group a ℓ) where
 
 open Group G using (monoid; Carrier; _∙_; _≈_; ε; ∙-cong; assoc; identity; refl; setoid; sym; _⁻¹; inverse; ⁻¹-cong)
 open import Relation.Binary.EqReasoning setoid using (begin_; _≈⟨_⟩_; _≡⟨_⟩_; _∎)
-open import Algebra.Props.Group G
+open import Algebra.Properties.Group G
 open import Algebra.Group.MoreProps G
 
 -- The Syntax type allows us to reflect the shape of the proof

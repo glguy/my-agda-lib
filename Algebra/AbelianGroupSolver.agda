@@ -13,9 +13,9 @@ open import Relation.Binary.EqReasoning setoid
 open import Algebra.Group.Exponentiation group
 open import Function using (_⟨_⟩_)
 open import Algebra.CommutativeMonoidSolver commutativeMonoid using (solve; _⊜_) renaming (_⊕_ to _⊙_)
-open import Algebra.Props.Group group
+open import Algebra.Properties.Group group
 open import Algebra.Group.MoreProps group using (inverse-unit)
-import Algebra.Props.AbelianGroup as AG
+import Algebra.Properties.AbelianGroup as AG
 open AG C using (⁻¹-∙-comm)
 
 data Expr (n : ℕ) : Set where
@@ -23,6 +23,8 @@ data Expr (n : ℕ) : Set where
   :0  : Expr n
   var : (x : Fin n) → Expr n
   inv : (x : Expr n) → Expr n
+
+infixl 6 _⊕_
 
 private
   Env = Vec Carrier
@@ -42,7 +44,7 @@ private
   var-NF (suc i) = + 0 ∷ var-NF i
 
   inv-NF : {n : ℕ} → Normal n → Normal n
-  inv-NF = Data.Vec.map -_
+  inv-NF = Data.Vec.map (-_)
 
   ε-NF : {n : ℕ} → Normal n
   ε-NF = replicate (+ 0)

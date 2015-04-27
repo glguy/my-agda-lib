@@ -16,6 +16,8 @@ data Expr (n : ℕ) : Set where
   :0   : Expr n
   var  : (x : Fin n) → Expr n
 
+infixl 6 _⊕_
+
 private
   Env = Vec Carrier
   Normal = Vec ℕ

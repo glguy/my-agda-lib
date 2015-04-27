@@ -86,3 +86,27 @@ private
 
 import Relation.Binary.Reflection as R
 open R setoid var ⟦_⟧ ⟦_⇓⟧ correct public
+
+private
+  -- Now for a simple example
+  Example = ∀ a b c d → (a ∙ ε ∙ b) ∙ (ε ∙ c ∙ d) ≈ a ∙ (b ∙ d) ∙ c
+
+  -- A manual proof using equational reasoning looks like this.
+  manual : Example
+  manual a b c d = begin
+    (a ∙  ε ∙ b)  ∙ (ε ∙  c  ∙ d)  ≈⟨ ∙-cong (assoc a ε b) (assoc ε c d) ⟩
+    (a ∙ (ε ∙ b)) ∙ (ε ∙ (c  ∙ d)) ≈⟨ ∙-cong (∙-cong refl (idˡ b)) (idˡ (c ∙ d)) ⟩
+    (a ∙      b)  ∙      (c  ∙ d)  ≈⟨ sym (assoc (a ∙ b) c d) ⟩
+     a ∙      b   ∙       c  ∙ d   ≈⟨ assoc (a ∙ b) c d ⟩
+    (a ∙      b)  ∙      (c  ∙ d)  ≈⟨ ∙-cong refl (comm c d) ⟩
+    (a ∙      b)  ∙      (d  ∙ c)  ≈⟨ sym (assoc (a ∙ b) d c) ⟩
+     a ∙      b   ∙       d  ∙ c   ≈⟨ ∙-cong (assoc a b d) refl ⟩
+     a ∙     (b   ∙       d) ∙ c   ∎
+    where
+      open import Data.Product using (proj₁)
+      idˡ = proj₁ identity
+
+  -- Let's see the solver in action!
+  automatic : Example
+  automatic = solve 4 (λ a b c d → (a ⊕ :0 ⊕ b) ⊕ (:0 ⊕ c ⊕ d) ⊜ a ⊕ (b ⊕ d) ⊕ c) refl
+                                -- ^ Here we reflect the shape of the proof we want
